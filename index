@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Drug Management</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+:root{
+    --bg:#e7ebf0;
+    --card:#eef1f6;
+    --text:#1f2937;
+    --accent:#4f46e5;
+    --shadow-light:#ffffff;
+    --shadow-dark:#c3c8d1;
+}
+body.dark{
+    --bg:#121826;
+    --card:#1b2235;
+    --text:#e5e7eb;
+    --accent:#60a5fa;
+    --shadow-light:#242c44;
+    --shadow-dark:#0b1020;
+}
+*{box-sizing:border-box;font-family:'Inter',sans-serif}
+body{margin:0;background:var(--bg);color:var(--text);transition:.3s;overflow-x:hidden;}
+a{text-decoration:none;color:inherit;}
+
+/* PAGE WRAP - content centered vertically */
+.page-wrap{
+    max-width:1080px;
+    margin:auto;
+    padding:120px 14px 40px;
+    min-height:calc(100vh - 100px);
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    position:relative;
+    z-index:2;
+}
+
+.clay{
+    background:var(--card);
+    border-radius:28px;
+    padding:32px;
+    box-shadow:12px 12px 24px var(--shadow-dark),-12px -12px 24px var(--shadow-light);
+    margin-bottom:42px;
+}
+
+/* Animated clay blobs */
+.blob{
+    position:absolute;
+    border-radius:50%;
+    filter:blur(80px);
+    opacity:0.35;
+    animation:moveBlob 12s infinite alternate ease-in-out;
+    z-index:1;
+}
+.blob1{width:280px;height:280px;background:#4f46e5;top:-60px;left:-80px;animation-delay:0s;}
+.blob2{width:220px;height:220px;background:#22c55e;top:200px;right:-100px;animation-delay:3s;}
+.blob3{width:260px;height:260px;background:#f97316;bottom:-80px;left:50px;animation-delay:6s;}
+@keyframes moveBlob{
+    0%{transform:translate(0,0) scale(1);}
+    50%{transform:translate(20px,-30px) scale(1.05);}
+    100%{transform:translate(-20px,20px) scale(0.95);}
+}
+
+/* Navbar */
+nav{position:fixed;top:14px;width:100%;z-index:100;}
+.nav-wrap{
+    background:rgba(238,241,246,.92);
+    backdrop-filter:blur(12px);
+    border-radius:26px;
+    padding:10px 18px;
+    margin:0 14px;
+    box-shadow:10px 10px 22px var(--shadow-dark),-10px -10px 22px var(--shadow-light);
+}
+body.dark .nav-wrap{background:rgba(27,34,53,.92);}
+.navbar{display:flex;align-items:center;justify-content:space-between;}
+.brand{font-size:22px;font-weight:700;color:var(--accent);}
+.nav-links{display:flex;gap:28px;align-items:center;}
+.nav-links a,.dropdown-toggle{position:relative;padding:6px 4px;font-weight:500;cursor:pointer;}
+.nav-links a::after,.dropdown-toggle::after{
+    content:"";
+    position:absolute;
+    left:0;
+    bottom:-6px;
+    width:0;
+    height:3px;
+    border-radius:4px;
+    background:linear-gradient(90deg,#4f46e5,#22c55e,#f97316);
+    transition:.35s;
+}
+.nav-links a:hover::after,.nav-links a.active::after,.dropdown:hover .dropdown-toggle::after{width:100%;}
+.dropdown{position:relative;}
+.dropdown-menu{
+    position:absolute;
+    top:38px;
+    left:-12px;
+    display:none;
+    background:var(--card);
+    border-radius:20px;
+    padding:14px;
+    min-width:160px;
+    box-shadow:10px 10px 20px var(--shadow-dark),-10px -10px 20px var(--shadow-light);
+}
+.dropdown-menu a{display:block;padding:8px 10px;border-radius:12px;font-size:14px;}
+.dropdown-menu a:hover{background:rgba(79,70,229,.12);color:var(--accent);}
+.dropdown:hover .dropdown-menu{display:block;}
+.nav-actions{display:flex;gap:12px;align-items:center;}
+.btn{border:none;padding:10px 14px;border-radius:14px;cursor:pointer;background:var(--card);box-shadow:6px 6px 12px var(--shadow-dark),-6px -6px 12px var(--shadow-light);transition:.25s;}
+.btn:hover{transform:translateY(-2px);}
+.menu-btn{display:none;}
+.btn-small{padding:6px 10px;font-size:14px;}
+
+/* Search & Table */
+.search-wrap{display:flex;gap:12px;align-items:center;margin-bottom:24px;}
+.search-wrap input{flex:1;padding:14px;border:none;border-radius:16px;background:var(--card);box-shadow:inset 4px 4px 8px var(--shadow-dark),inset -4px -4px 8px var(--shadow-light);}
+.table-wrap{margin-top:24px;}
+table{width:100%;border-collapse:collapse;table-layout:fixed;}
+th,td{padding:12px;text-align:left;border-bottom:1px solid #ccc;word-wrap:break-word;}
+th{background:var(--card);box-shadow:inset 2px 2px 4px var(--shadow-dark),inset -2px -2px 4px var(--shadow-light);}
+td{background:var(--card);border-radius:12px;box-shadow:6px 6px 12px var(--shadow-dark),-6px -6px 12px var(--shadow-light);}
+td span.highlight{background:#fde047;color:#000;font-weight:600;padding:2px 4px;border-radius:4px;}
+
+/* Modal */
+.modal-bg{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.4);display:none;justify-content:center;align-items:center;z-index:200;}
+.modal{background:var(--card);border-radius:28px;padding:24px;width:90%;max-width:400px;box-shadow:12px 12px 24px var(--shadow-dark),-12px -12px 24px var(--shadow-light);}
+.modal h2{text-align:center;margin-bottom:16px;}
+.modal input{width:100%;margin-bottom:14px;padding:12px;border-radius:16px;border:none;box-shadow:inset 4px 4px 8px var(--shadow-dark),inset -4px -4px 8px var(--shadow-light);}
+.modal input[type="password"]{letter-spacing:2px;}
+
+/* Toast */
+.toast{position:fixed;bottom:20px;right:20px;background:var(--card);padding:14px 18px;border-radius:16px;box-shadow:6px 6px 12px var(--shadow-dark),-6px -6px 12px var(--shadow-light);display:flex;align-items:center;gap:10px;font-weight:500;opacity:0;pointer-events:none;transition:opacity .3s;}
+.toast.show{opacity:1;pointer-events:auto;}
+.toast.success{border-left:6px solid #22c55e;}
+.toast.error{border-left:6px solid #ef4444;}
+
+/* Responsive adjustments */
+@media(max-width:768px){
+    .page-wrap{padding:120px 12px 30px;}
+    .nav-wrap{padding:10px 12px;}
+    .nav-links{display:none;position:absolute;top:72px;right:12px;background:var(--card);flex-direction:column;padding:18px;border-radius:20px;gap:18px;box-shadow:10px 10px 20px var(--shadow-dark),-10px -10px 20px var(--shadow-light);}
+    .nav-links.show{display:flex;}
+    .menu-btn{display:block;}
+    .dropdown-menu{position:static;box-shadow:none;}
+    .search-wrap{flex-direction:column;gap:12px;}
+}
+</style>
+</head>
+<body>
+
+<!-- Clay blobs -->
+<div class="blob blob1"></div>
+<div class="blob blob2"></div>
+<div class="blob blob3"></div>
+
+<!-- NAVBAR -->
+<nav>
+<div class="nav-wrap">
+<div class="navbar">
+    <div class="brand">Find Drugs..</div>
+    <div class="nav-links" id="menu">
+        <a href="#">Home</a>
+        <a href="#">Drugs</a>
+        <a href="#">Courses</a>
+    </div>
+    <div class="nav-actions">
+        <button class="btn" id="themeBtn" onclick="toggleTheme()">🌙</button>
+        <button class="btn menu-btn" onclick="toggleMenu()">☰</button>
+    </div>
+</div>
+</div>
+</nav>
+
+<div class="page-wrap">
+<div class="clay">
+    <div class="search-wrap">
+        <input type="text" id="searchInput" placeholder="Search drug..." onkeyup="filterTable()">
+        <button class="btn" onclick="filterTable()">Search</button>
+        <button class="btn" onclick="openModal()">+ Add</button>
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr><th>Drug</th><th>Disease</th><th>ICD Code</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="drugTable"></tbody>
+        </table>
+    </div>
+</div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-bg" id="modal">
+<div class="modal">
+    <h2 id="modalTitle">Add Drug</h2>
+    <input id="drugName" placeholder="Enter Drug">
+    <input id="diseaseName" placeholder="Enter Disease">
+    <input id="icdCode" placeholder="Enter ICD Code">
+    <input id="modalPassword" type="password" placeholder="Enter Password">
+    <button class="btn" id="modalSaveBtn">Save</button>
+</div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><i class="fa fa-check-circle"></i><span id="toastMsg"></span></div>
+
+<script>
+const PASSWORD = "1234";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxhBWtpAR6cIbgTQ9_8HlaG9hB_S6rhhK-AmSI_LmimiNNqgYILGv6Ih-Cj77RxMd3G/exec";
+let editId = null;
+
+/* NAVBAR */
+function toggleMenu(){document.getElementById("menu").classList.toggle("show");}
+function toggleTheme(){document.body.classList.toggle("dark");themeBtn.textContent=document.body.classList.contains("dark")?"🌞":"🌙";}
+
+/* MODAL */
+function openModal(){
+    document.getElementById("modalTitle").innerText = "Add Drug";
+    document.getElementById("drugName").value = "";
+    document.getElementById("diseaseName").value = "";
+    document.getElementById("icdCode").value = "";
+    document.getElementById("modalPassword").value = "";
+    document.getElementById("modal").style.display = "flex";
+}
+function closeModal(){document.getElementById("modal").style.display="none";}
+document.getElementById("modal").addEventListener("click",e=>{if(e.target===e.currentTarget) closeModal();});
+
+/* TOAST */
+function showToast(message,type="success"){
+    const toast=document.getElementById("toast");
+    const icon = toast.querySelector("i");
+    toast.className="toast show "+type;
+    icon.className="fa "+(type==="success"?"fa-check-circle":"fa-exclamation-circle");
+    document.getElementById("toastMsg").innerText=message;
+    setTimeout(()=>toast.classList.remove("show"),3000);
+}
+
+/* LOAD DRUGS */
+async function loadDrugs(){
+    const url = `${SCRIPT_URL}?action=read&module=drugs&password=${PASSWORD}`;
+    const table = document.getElementById("drugTable");
+    table.innerHTML="";
+    await fetch(url).then(res=>res.json()).then(data=>{
+        data.forEach(row=>{
+            const tr=table.insertRow();
+            tr.insertCell(0).innerHTML=row[1];
+            tr.insertCell(1).innerHTML=row[2];
+            tr.insertCell(2).innerHTML=row[3];
+            const tdActions = tr.insertCell(3);
+            tdActions.style.display="flex"; tdActions.style.gap="6px";
+
+            const editBtn = document.createElement("button");
+            editBtn.className="btn btn-small";
+            editBtn.innerHTML='<i class="fa fa-edit"></i> Edit';
+            editBtn.onclick = ()=>{
+                editId=row[0];
+                document.getElementById("drugName").value=row[1];
+                document.getElementById("diseaseName").value=row[2];
+                document.getElementById("icdCode").value=row[3];
+                document.getElementById("modalTitle").innerText = "Edit Drug";
+                document.getElementById("modal").style.display = "flex";
+            }
+            tdActions.appendChild(editBtn);
+
+            const delBtn = document.createElement("button");
+            delBtn.className="btn btn-small";
+            delBtn.innerHTML='<i class="fa fa-trash"></i> Delete';
+            delBtn.onclick = async ()=>{
+                const enteredPass = prompt("Enter password to delete:");
+                if(enteredPass !== PASSWORD){ showToast("Wrong password!","error"); return; }
+                await deleteDrug(row[0]);
+            }
+            tdActions.appendChild(delBtn);
+        });
+    }).catch(err=>showToast("Error loading data","error"));
+}
+
+/* SAVE / UPDATE */
+document.getElementById("modalSaveBtn").onclick = async function(){
+    const drug=document.getElementById("drugName").value.trim();
+    const disease=document.getElementById("diseaseName").value.trim();
+    const icd=document.getElementById("icdCode").value.trim();
+    const pass=document.getElementById("modalPassword").value;
+    if(!drug || !disease || !icd || !pass){showToast("Fill all fields","error"); return;}
+    if(pass!==PASSWORD){showToast("Wrong password","error"); return;}
+    let url;
+    if(editId){
+        url=`${SCRIPT_URL}?action=update&module=drugs&password=${PASSWORD}&id=${editId}&col1=${encodeURIComponent(drug)}&col2=${encodeURIComponent(disease)}&col3=${encodeURIComponent(icd)}`;
+        editId=null;
+    }else{
+        url=`${SCRIPT_URL}?action=add&module=drugs&password=${PASSWORD}&col1=${encodeURIComponent(drug)}&col2=${encodeURIComponent(disease)}&col3=${encodeURIComponent(icd)}`;
+    }
+    await fetch(url).then(res=>res.json()).then(res=>{
+        if(res.status==="added") showToast("Drug added successfully","success");
+        else if(res.status==="updated") showToast("Drug updated successfully","success");
+        else showToast("Error saving data","error");
+        closeModal();
+        loadDrugs();
+    }).catch(()=>showToast("Network error","error"));
+}
+
+/* DELETE */
+async function deleteDrug(id){
+    const url=`${SCRIPT_URL}?action=delete&module=drugs&password=${PASSWORD}&id=${id}`;
+    await fetch(url).then(res=>res.json()).then(res=>{
+        if(res.status==="deleted"){ showToast("Drug deleted","success"); loadDrugs(); }
+        else showToast("Error deleting","error");
+    }).catch(()=>showToast("Network error","error"));
+}
+
+/* SEARCH + HIGHLIGHT */
+function filterTable(){
+    const input=document.getElementById("searchInput").value.toLowerCase();
+    const table=document.getElementById("drugTable");
+    for(let i=0;i<table.rows.length;i++){
+        let row=table.rows[i]; let match=false;
+        for(let j=0;j<3;j++){
+            const text=row.cells[j].innerText;
+            const lower=text.toLowerCase();
+            if(lower.includes(input)&&input!==""){
+                const regex=new RegExp(`(${input})`,"gi");
+                row.cells[j].innerHTML=text.replace(regex,'<span class="highlight">$1</span>');
+                match=true;
+            }else{row.cells[j].innerHTML=text;}
+        }
+        row.style.display=match||input===""?"":"none";
+    }
+}
+
+// Load on start
+window.onload = loadDrugs;
+</script>
+</body>
+</html>
