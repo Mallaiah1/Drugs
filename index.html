@@ -151,6 +151,21 @@ td span.highlight{background:#fde047;color:#000;font-weight:600;padding:2px 4px;
 </head>
 <body>
 
+    <!-- login password -->
+    <!-- PIN Overlay -->
+<div id="pinOverlay" style="
+    position:fixed;top:0;left:0;width:100%;height:100%;background:var(--bg);
+    display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:500;">
+    <h2 style="margin-bottom:20px;color:var(--accent);">Enter PIN to Access</h2>
+    <input id="pinInput" type="password" placeholder="Enter PIN" style="
+        padding:12px 18px;border-radius:14px;border:none;box-shadow:inset 4px 4px 8px var(--shadow-dark),inset -4px -4px 8px var(--shadow-light);
+        margin-bottom:14px;font-size:16px;text-align:center;
+    ">
+    <button class="btn" id="pinBtn">Enter</button>
+</div>
+<!-- end.... -->
+
+    
 <!-- Clay blobs -->
 <div class="blob blob1"></div>
 <div class="blob blob2"></div>
@@ -209,6 +224,46 @@ td span.highlight{background:#fde047;color:#000;font-weight:600;padding:2px 4px;
 <div class="toast" id="toast"><i class="fa fa-check-circle"></i><span id="toastMsg"></span></div>
 
 <script>
+
+// login 
+const PAGE_PIN = "1234"; // Set your PIN
+const pinOverlay = document.getElementById("pinOverlay");
+
+function showPinOverlay(){
+    pinOverlay.style.display = "flex"; // show overlay
+    document.getElementById("pinInput").value = "";
+}
+
+// Check PIN
+function checkPin(){
+    const entered = document.getElementById("pinInput").value;
+    if(entered === PAGE_PIN){
+        pinOverlay.style.display = "none"; // unlock
+        showToast("Access granted","success");
+    } else {
+        showToast("Wrong PIN!","error");
+        document.getElementById("pinInput").value = "";
+    }
+}
+
+document.getElementById("pinBtn").onclick = checkPin;
+
+// Optional: Enter key submits
+document.getElementById("pinInput").addEventListener("keypress",function(e){
+    if(e.key==="Enter") checkPin();
+});
+
+// Show PIN overlay on page load
+window.onload = function(){
+    showPinOverlay();
+    loadDrugs(); // your existing load function
+};
+
+// Re-lock page every 10 minutes (600,000 ms)
+setInterval(showPinOverlay, 600000); 
+
+
+// login end...
 const PASSWORD = "1234";
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxhBWtpAR6cIbgTQ9_8HlaG9hB_S6rhhK-AmSI_LmimiNNqgYILGv6Ih-Cj77RxMd3G/exec";
 let editId = null;
